@@ -7,6 +7,10 @@ import os
 import datetime
 import random
 from Atlas import randoming, pic_list, positive, gif_list
+from h_gif import h_gif, w_gif
+from m_aes import male
+from f_aes import female
+from c_aes import couple
 import requests
 import sqlite3
 import re
@@ -21,12 +25,8 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 client = commands.Bot(command_prefix='!', intents = intents)
-db_conn = sqlite3.connect('profile.db')
-db_cursor = db_conn.cursor()
 
-# create table if it does not exist
-db_cursor.execute('''CREATE TABLE IF NOT EXISTS profile
-                     (user_id INTEGER, item TEXT)''')
+
 webhook_url = 'https://discord.com/api/webhooks/1118140114514755684/ijYto78EQ8pQetqBoivurndUoVUw9tygqd7jeGtKBydAR3RKB8a5siz5YBAgeTgOn95w'
 
 
@@ -57,9 +57,13 @@ async def help(interaction: discord.Interaction):
                           " </words:1135286623223959681> - shows unique and pleasant words\n"+
                           " </aesthetics:1135286623223959676> - shows random pictures for character and/or story inspiration \n"+
                           " </affirmations:1135286623223959679> - shows some positive vibes \n" +
-                          " </aesthetic_gifs:1135286623223959675> - shows random gifs \n",
-                        #   " </add:1134546090125955124> - creates a profile for you where you can store your designs, this command however is under work \n"+
-                        #   " </view:1134551019179749385> - lets you to view your profile",
+                          " </aesthetic_gifs:1135286623223959675> - shows random gifs \n"+
+                          "</male_aesthetics:1145051885783498824> - shows random male aesthetics \n"+
+                          "</female_aesthetics:1145051885783498825> - shows random female aesthetics \n"+
+                          "</couple_aesthetics:1145051885783498826> - shows random couple aesthetics \n"+
+                          " </hug:1145051885783498822> - gives a warm hug to whoever you want \n"+
+                          "</wave:1145051885783498823> - wave at anyone you want\n",
+                        
                           color=discord.Color.dark_orange())
     embed.set_image(url="https://cdn.discordapp.com/attachments/1099693772608122982/1104408296967897170/fall-autumn.gif")
     embed.set_footer(text="Have a nice day!")
@@ -78,43 +82,76 @@ async def hello(interaction: discord.Interaction):
     response = requests.post(webhook_url, json=data)
     await interaction.response.send_message("Hello", ephemeral=False)
 
+@client.tree.command(name = "hug", description="send a warm hug")  
 
-# @client.tree.command(name="add", description="creates your profile")   
-# async def add(interaction: discord.Interaction, item: str):
-#         user_id = interaction.user.id
-#         db_cursor.execute("INSERT INTO profile VALUES (?, ?)", (user_id, item))
-#         db_conn.commit()
-#         await interaction.response.send_message(f"{item} added to your profile!", ephemeral=False)
-
-# @client.tree.command(name="view", description="view all items in your profile")   
-# async def add(interaction,member: discord.Member):
-#     user_id = interaction.user.id
-
+async def hug(interaction: discord.Interaction, member:discord.Member):
+    user_ = interaction.user
+    member1 = member
     
-#     db_cursor.execute("SELECT item FROM profile WHERE user_id=?", (user_id,))
-#     items = db_cursor.fetchall()
-#     if items:
-#         item_list = '\n'.join([item[0] for item in items])
-#         embed = discord.Embed(title=f"{member}'s Profile",
-#                               color=discord.Color.dark_magenta())
-#         embed.set_thumbnail(url=member.avatar)
-#         embed.add_field(name="ID", value=member.id)
-#         num_items = len(items)
-#         embed.add_field(name="Number of items", value=num_items, inline=False)
-#         for item in items:
-#             # Check if the item is a valid URL
-#             if not re.match(r'^https?://\S+\.\S+', item[0]):
-#                 # If the item is not a valid URL, add a prefix to make it a valid URL
-#                 item_url = f"http://{item[0]}"
-#             else:
-#                 item_url = item[0]
-#             # Add a separate field for each item in item_list
-#             embed.add_field(name="", value=f"[Image]({item_url})", inline=False)
-#         await interaction.response.send_message(embed=embed, ephemeral=False)
-#     else:
-#         await interaction.response.send_message("Your profile is empty.", ephemeral=False)
-        
-        
+    embed = discord.Embed(title=f"{user_} sends a hug at {member1}'s way", color=discord.Color.dark_red())
+    hugs = random.choice(h_gif)
+    embed.set_image(url=hugs)
+    embed.set_footer(text="Have a nice day!")  
+    await interaction.response.send_message(embed=embed)
+
+
+@client.tree.command(name = "wave", description="wave")  
+
+async def wave(interaction: discord.Interaction, member:discord.Member):
+    user_ = interaction.user
+    member1 = member    
+    embed = discord.Embed(title=f"{user_} is waving at {member1}", color=discord.Color.dark_red())
+    waves = random.choice(w_gif)
+    embed.set_image(url=waves)
+    embed.set_footer(text="Have a nice day!")  
+    await interaction.response.send_message(embed=embed)
+    
+@client.tree.command(name= "male_aesthetics", description="Shows different male aesthetic character/story inspiration")
+async def male_aesthetics(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    user_name = interaction.user.name
+    embed = discord.Embed(title= " ",
+                          description= "The pictures belong to their respective owners",
+                          color=discord.Color.light_gray())
+    male_= random.choice(male) 
+    embed.set_image(url=male_)
+    embed.set_footer(text="Have a nice day!")
+    data = {"content": f"User {user_name}({user_id}) used aesthetics."}
+    
+    response = requests.post(webhook_url, json=data)
+    await interaction.response.send_message(embed=embed, ephemeral=False)  
+    
+@client.tree.command(name= "female_aesthetics", description="Shows different female aesthetic character/story inspiration")
+async def female_aesthetics(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    user_name = interaction.user.name
+    embed = discord.Embed(title= " ",
+                          description= "The pictures belong to their respective owners",
+                          color=discord.Color.light_gray())
+    female_= random.choice(female) 
+    embed.set_image(url=female_)
+    embed.set_footer(text="Have a nice day!")
+    data = {"content": f"User {user_name}({user_id}) used aesthetics."}
+    
+    response = requests.post(webhook_url, json=data)
+    await interaction.response.send_message(embed=embed, ephemeral=False)   
+    
+@client.tree.command(name= "couple_aesthetics", description="Shows different couple aesthetic character/story inspiration")
+async def couple_aesthetics(interaction: discord.Interaction):
+    user_id = interaction.user.id
+    user_name = interaction.user.name
+    embed = discord.Embed(title= " ",
+                          description= "The pictures belong to their respective owners",
+                          color=discord.Color.light_gray())
+    couple_= random.choice(couple) 
+    embed.set_image(url=couple_)
+    embed.set_footer(text="Have a nice day!")
+    data = {"content": f"User {user_name}({user_id}) used aesthetics."}
+    
+    response = requests.post(webhook_url, json=data)
+    await interaction.response.send_message(embed=embed, ephemeral=False) 
+    
+     
 @client.tree.command(name = "info", description="provides information about different aesthetics provided by the bot")
 async def info(interaction: discord.Interaction):
     user_id = interaction.user.id
